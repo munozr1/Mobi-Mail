@@ -41,10 +41,10 @@ export default function EmailView() {
   return (
     <div className="shadow-md ">
       <div id="title" className="w-full  mb-2 border-b p-3">
-        <h1 class="text-lg mt-1" >{email.subject}</h1>
+        <h1 className="text-lg mt-1" >{email.subject}</h1>
         <p className="text-sm">From: {email.from}</p>
       </div>
-      <div class="text-sm p-3" dangerouslySetInnerHTML={email.body}></div>
+      <div className="text-sm p-3" dangerouslySetInnerHTML={email.body}></div>
     </div>
   );
 }

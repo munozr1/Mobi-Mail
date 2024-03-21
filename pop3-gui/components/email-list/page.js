@@ -1,5 +1,3 @@
-'use client'
-
 let emails = [
   {
     id: 1,
@@ -44,12 +42,12 @@ export default function EmailList() {
     <ul className="border">
       {
         emails.map(email => (
-          <li key={email.id} class="flex items-center border-b-2 justify-between ">
-            <div class="ml-1 flex-col">
-            <h1 class="text-lg mt-1">{email.subject}</h1>
-            <p class="text-sm">{email.body}</p>
+          <li key={email.id} className="flex items-center border-b-2 justify-between ">
+            <div className="ml-1 flex-col">
+            <h1 className="text-lg mt-1">{email.subject}</h1>
+            <p className="text-sm">{email.body}</p>
             </div>
-            <div class="text-xs text-gray-500 mr-1">{formatDate(email.date)}</div>
+            <div className="text-xs text-gray-500 mr-1">{formatDate(email.date)}</div>
           </li>
         ))
       }
