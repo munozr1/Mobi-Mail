@@ -1,19 +1,5 @@
-let emails = [
-  {
-    id: 1,
-    from: 'person 2',
-    subject: 'Test email',
-    body: 'This is a test email',
-    date: '2021-10-10T12:00:00Z'
-  },
-  {
-    id: 2,
-    from: 'person 4',
-    subject: 'Test email 2',
-    body: 'This is a test email 2',
-    date: '2024-03-20T13:05:10.362Z'
-  },
-]
+
+import { useState} from "react";
 
 function formatDate(dateString) {
   const emailDate = new Date(dateString);
@@ -36,16 +22,41 @@ function formatDate(dateString) {
   }
 }
 
-export default function EmailList() {
+export default function EmailList({action, tab}) {
+  const [inbox, setInbox] = useState([
+    {
+      id: 1,
+      from: 'person 2',
+      subject: 'Test email',
+      body:{ __html:'This is a test email vody'},
+      date: '2021-10-10T12:00:00Z'
+    },
+    {
+      id: 2,
+      from: 'person 4',
+      subject: 'Test email 2',
+      body:{ __html:'This is a test email'},
+      date: '2024-03-20T13:05:10.362Z'
+    },
+  ]);
+  const [sent, setSent] = useState([{
+    id: 1,
+    from: 'person 2',
+    subject: 'Test email',
+    body:{ __html:'This is a test email vody'},
+    date: '2021-10-10T12:00:00Z'
+  }]);
 
+  //TODO: Fetch emails from API
+  if(tab == "inbox"){
   return (
     <ul className="border">
       {
-        emails.map(email => (
-          <li key={email.id} className="flex items-center border-b-2 justify-between ">
+        inbox.map(email => (
+          <li key={email.id} onClick={() => action(email)} className="flex items-center border-b-2 justify-between scale-100 hover:scale-105 ml-2 mr-2 hover:cursor-pointer">
             <div className="ml-1 flex-col">
             <h1 className="text-lg mt-1">{email.subject}</h1>
-            <p className="text-sm">{email.body}</p>
+            {/* <p className="text-sm">{email.body}</p> */}
             </div>
             <div className="text-xs text-gray-500 mr-1">{formatDate(email.date)}</div>
           </li>
@@ -53,5 +64,22 @@ export default function EmailList() {
       }
     </ul>
   );
+  }
+  return (
+    <ul className="border">
+      {
+        sent.map(email => (
+          <li key={email.id} onClick={() => action(email)} className="flex items-center border-b-2 justify-between scale-100 hover:scale-105 ml-2 mr-2 hover:cursor-pointer">
+            <div className="ml-1 flex-col">
+            <h1 className="text-lg mt-1">{email.subject}</h1>
+            {/* <p className="text-sm">{email.body}</p> */}
+            </div>
+            <div className="text-xs text-gray-500 mr-1">{formatDate(email.date)}</div>
+          </li>
+        ))
+      }
+    </ul>
+  );
+
 
 }

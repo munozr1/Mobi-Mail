@@ -8,7 +8,10 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [newEmail, ToggleNewEmailUi] = useState(true);
+  const [newEmail, ToggleNewEmailUi] = useState(false);
+  const [side_email_view, update_side_email_view] = useState(null);
+  const [tab, setTab] = useState("inbox");
+
   const openNewEmailUi = () => {
     ToggleNewEmailUi(true);
   }
@@ -27,9 +30,9 @@ export default function Home() {
   }, [newEmail]);
 
   return (
-    <main className="">
+    <main className=" overflow-hidden">
       <NavBar>
-        <Tooltip message="Inbox">
+        <Tooltip message="Inbox" action={() => setTab("inbox")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -61,7 +64,7 @@ export default function Home() {
             />
           </svg>
         </Tooltip>
-        <Tooltip message="Sent">
+        <Tooltip message="Sent" action={() => setTab("sent")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -97,10 +100,10 @@ export default function Home() {
       </NavBar>
       <div className="flex">
         <div className="min-w-80">
-          <EmailList />
+          <EmailList action={update_side_email_view} tab={tab}/>
         </div>
         <div className="m-2">
-          <EmailView />
+          <EmailView email={side_email_view} />
         </div>
         {newEmail ? (
           <div className="mt- backdrop-blur-xs fixed flex h-full w-full justify-center rounded-md bg-gray-800 bg-opacity-20 ">

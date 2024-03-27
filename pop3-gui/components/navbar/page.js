@@ -3,6 +3,7 @@
 import Image from "next/image";
 
 export default function NavBar({children}) {
+  //TODO: Add delete email functionality. Delete email call, then refresh email list.
   return (
     <nav className="w-full h-14 shadow-md flex justify-between">
       <span className="inline-flex h-16 w-16 items-center justify-center ml-8">
