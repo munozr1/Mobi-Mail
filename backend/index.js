@@ -9,27 +9,48 @@ let db = new sqlite3.Database('emaildb');
 
 app.use(express.json());
 
-// 1. Create a new user
-app.post('/users', (req, res) => {
-    app.post('/users', async (req, res) => {
-        const { username, password, email } = req.body;
-        if (!username || !password || !email) {
-            return res.status(400).json({ error: 'Username, password, and email are required.' });
+app.post('/users', async (req, res) => {
+    const { username, password, email } = req.body;
+    if (!username || !password || !email) {
+        return res.status(400).json({ error: 'Username, password, and email are required.' });
+    }
+
+    try {
+        const salt = await bcrypt.genSalt(8);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        db.run('INSERT INTO users (username, email, password_hash, salt) VALUES (?, ?, ?, ?)', [username, email, hashedPassword, salt], function(err) {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            const createdUserId = this.lastID;
+            res.status(201).json({ userId: createdUserId, username, email });
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/auth', async (req, res) => {
+    const { email, password } = req.body;
+
+    db.all(`SELECT * FROM users WHERE email = "${email}"`, async (err, rows) => {
+        if (err)
+            return res.status(500).json({ error: err.message });
+        else if (rows.length === 0)
+            return res.status(401).json({ error: 'User not found' });
+
+        const user = rows[0];
+        const hashedPassword = await bcrypt.hash(password, user.salt);
+        // const passwordMatch = await bcrypt.compare(hashedPassword, user.password_hash);
+        console.log(hashedPassword)
+        console.log(user.password_hash)
+        // console.log(passwordMatch)
+        if (hashedPassword !== user.password_hash) {
+            return res.status(401).json({ error: 'Invalid email or password.' });
         }
 
-        try {
-            const hashedPassword = await bcrypt.hash(password, 8);
-
-            db.run('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', [username, email, hashedPassword], function(err) {
-                if (err) {
-                    return res.status(500).json({ error: err.message });
-                }
-                const createdUserId = this.lastID;
-                res.status(201).json({ userId: createdUserId, username, email });
-            });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
+        res.json({ userId: user.user_id, username: user.username, email: user.email });
     });
 });
 
@@ -44,7 +65,6 @@ app.get('/users/:userId/sent', (req, res) => {
     }
     res.json(rows);
   });
-
 
 });
 
@@ -64,14 +84,12 @@ app.get('/inbox', (req, res) => {
 app.post('/emails', (req, res) => {
 
     const { senderId, recipient, subject, body } = req.body;
-    const queryRes = db.all(`SELECT user_id FROM users WHERE email = "${recipient}"`, (err, rows) => {
+    let id = 0;
+    const aueryRes= db.all(`SELECT user_id FROM users WHERE email = "${recipient}"`, (err, rows) => {
       if (err) {
-        console.log("bruh", err.message);
         return res.status(500).json({ error: err.message });
       } else {
-        recipientId = rows[0].user_id;
-        console.log("got ID: ", recipientId)
-        return recipientId;
+        id = rows[0].user_id;
       }
     });
 
@@ -80,7 +98,7 @@ app.post('/emails', (req, res) => {
     try {
 
         const emailInsertStmt = db.prepare('INSERT INTO emails (from_id, to_id, subject, body) VALUES (?, ?, ?, ?)');
-        emailInsertStmt.run(senderId, queryRes, subject, body);
+        emailInsertStmt.run(senderId, id, subject, body);
 
         db.run('COMMIT;');
         res.status(201).json({ message: 'Email sent successfully' });
