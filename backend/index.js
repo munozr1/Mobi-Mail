@@ -49,10 +49,10 @@ app.post('/auth', async (req, res) => {
 });
 
 // 2. Retrieve a user's sent emails
-app.get('/users/:userId/sent', (req, res) => {
+app.get('/sent', (req, res) => {
   const userId = req.query.userId;
 
-  db.all(`SELECT * FROM emails WHERE sender_id = ${userId}`, (err, rows) => {
+  db.all(`SELECT * FROM emails WHERE from_id = ${userId}`, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
