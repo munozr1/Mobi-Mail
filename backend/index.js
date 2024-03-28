@@ -5,8 +5,6 @@ const app = express();
 const port = 3000;
 
 let db = new sqlite3.Database('emaildb');
-
-
 app.use(express.json());
 
 app.post('/users', async (req, res) => {
@@ -82,7 +80,6 @@ app.get('/inbox', (req, res) => {
 });
 
 app.post('/emails', (req, res) => {
-
     const { senderId, recipient, subject, body } = req.body;
     let id = 0;
     const aueryRes= db.all(`SELECT user_id FROM users WHERE email = "${recipient}"`, (err, rows) => {
@@ -96,7 +93,6 @@ app.post('/emails', (req, res) => {
     db.run('BEGIN TRANSACTION;');
 
     try {
-
         const emailInsertStmt = db.prepare('INSERT INTO emails (from_id, to_id, subject, body) VALUES (?, ?, ?, ?)');
         emailInsertStmt.run(senderId, id, subject, body);
 
