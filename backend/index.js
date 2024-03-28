@@ -40,10 +40,6 @@ app.post('/auth', async (req, res) => {
 
         const user = rows[0];
         const hashedPassword = await bcrypt.hash(password, user.salt);
-        // const passwordMatch = await bcrypt.compare(hashedPassword, user.password_hash);
-        console.log(hashedPassword)
-        console.log(user.password_hash)
-        // console.log(passwordMatch)
         if (hashedPassword !== user.password_hash) {
             return res.status(401).json({ error: 'Invalid email or password.' });
         }
@@ -54,7 +50,7 @@ app.post('/auth', async (req, res) => {
 
 // 2. Retrieve a user's sent emails
 app.get('/users/:userId/sent', (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.query.userId;
 
   db.all(`SELECT * FROM emails WHERE sender_id = ${userId}`, (err, rows) => {
     if (err) {
@@ -66,16 +62,20 @@ app.get('/users/:userId/sent', (req, res) => {
 
 });
 
-// 3. Retrieve a user's received emails
 app.get('/inbox', (req, res) => {
-    const userId = req.params.userId;
-    const query = `SELECT * FROM emails WHERE email_id = ${req.body.userId}`
-    db.run(query, (err, rows) => {
+
+    const userId = req.query.userId;
+    console.log("inbox => ",userId);
+    const query = `SELECT * FROM emails WHERE to_id = ${userId}`
+    console.log(query)
+    db.all(query, (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
+        console.log("rows => ", rows);
         res.json(rows);
+
     });
 });
 
@@ -87,21 +87,19 @@ app.post('/emails', (req, res) => {
         return res.status(500).json({ error: err.message });
       } else {
         id = rows[0].user_id;
+        console.log(rows)
+        console.log(id)
+        try {
+            const emailInsertStmt = db.prepare('INSERT INTO emails (from_id, to_id, subject, body) VALUES (?, ?, ?, ?)');
+            emailInsertStmt.run(senderId, id, subject, body);
+            res.status(201).json({ message: 'Email sent successfully' });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        };
       }
     });
 
-    db.run('BEGIN TRANSACTION;');
 
-    try {
-        const emailInsertStmt = db.prepare('INSERT INTO emails (from_id, to_id, subject, body) VALUES (?, ?, ?, ?)');
-        emailInsertStmt.run(senderId, id, subject, body);
-
-        db.run('COMMIT;');
-        res.status(201).json({ message: 'Email sent successfully' });
-    } catch (error) {
-        db.run('ROLLBACK;');
-        res.status(500).json({ error: error.message });
-    }
 });
 
 
