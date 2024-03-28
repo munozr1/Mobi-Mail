@@ -1,11 +1,17 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose()
 const bcrypt = require('bcryptjs');
+const cors = require('cors');
 const app = express();
 const port = 8080;
 
-let db = new sqlite3.Database('emaildb');
+const db = new sqlite3.Database('emaildb');
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200
+}
 app.use(express.json());
+app.use(cors(corsOptions));
 
 app.post('/users', async (req, res) => {
     const { username, password, email } = req.body;
@@ -29,7 +35,7 @@ app.post('/users', async (req, res) => {
     }
 });
 
-app.post('/auth', async (req, res) => {
+app.post('/auth', cors(), async (req, res) => {
     const { email, password } = req.body;
 
     db.all(`SELECT * FROM users WHERE email = "${email}"`, async (err, rows) => {
