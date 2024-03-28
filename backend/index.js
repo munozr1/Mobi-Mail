@@ -2,7 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose()
 const bcrypt = require('bcryptjs');
 const app = express();
-const port = 3000;
+const port = 8080;
 
 let db = new sqlite3.Database('emaildb');
 app.use(express.json());
