@@ -109,16 +109,16 @@ app.post('/emails', (req, res) => {
 });
 
 app.get('/search', (req, res) => {
-    const { userId, query } = req.query;
+    const  userId = req.query.userId;
+    const  query  = req.query.query;
+    console.log("search => ",userId, query);
 
         if (!userId || !query) {
         return res.status(400).json({ error: 'UserId and query string are required.' });
     }
 
-    const querySql = `SELECT * FROM emails WHERE (to_id = ? OR from_id = ?) AND body LIKE ?`;
-    const queryParams = [userId, userId, `%${query}%`];
 
-    db.all(querySql, queryParams, (err, rows) => {
+    db.all(`SELECT * FROM emails WHERE (to_id = ${userId} OR from_id = ${userId}) AND body LIKE '%${query}%'`, (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;

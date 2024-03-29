@@ -20,12 +20,13 @@ export default function Home() {
   }
 
   const search = async () => {
-    const search = document.getElementById("search").value;
-    if(search){
+    const string = document.getElementById("search").value;
+    console.log(string);
+    if(string){
       setLoading(true);
       try{
         const url = process.env.NEXT_PUBLIC_BACKEND_URL;
-        const api_url = `${url}/search?userId=${global.userId}&search=${search}`;
+        const api_url = `${url}/search?userId=${global.userId}&query=${string}`;
         const response = await fetch(api_url);
         let data = await response.json();
         data = data.map(email => {
