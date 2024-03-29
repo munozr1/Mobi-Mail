@@ -108,6 +108,24 @@ app.post('/emails', (req, res) => {
 
 });
 
+app.get('/search', (req, res) => {
+    const { userId, query } = req.query;
+
+        if (!userId || !query) {
+        return res.status(400).json({ error: 'UserId and query string are required.' });
+    }
+
+    const querySql = `SELECT * FROM emails WHERE (to_id = ? OR from_id = ?) AND body LIKE ?`;
+    const queryParams = [userId, userId, `%${query}%`];
+
+    db.all(querySql, queryParams, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
 
 
 app.listen(port, () => {

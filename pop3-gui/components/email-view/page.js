@@ -1,6 +1,5 @@
 
 export default function EmailView({email}) {
-  console.log(email);
 
   if(email != null){
   return (
