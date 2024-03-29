@@ -164,7 +164,7 @@ if(global.userId)
         {newEmail ? (
           <div className="mt- backdrop-blur-xs fixed flex h-full w-full justify-center rounded-md bg-gray-800 bg-opacity-20 ">
             <div className="mt-16 h-2/6 w-1/2">
-              <NewEmail />
+              <NewEmail id={global.userId} />
             </div>
           </div>
         ) : null}

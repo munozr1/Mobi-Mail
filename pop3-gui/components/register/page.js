@@ -1,10 +1,11 @@
 
 export default function Register({setGlobal, action}) {
+  // let document = new Document();
   const authenticate = async () => {
     const body = JSON.stringify({
       email: document.getElementById("emailInput").value,
       password: document.getElementById("passwordInput").value,
-      username: docuement.getElementById("usernameInput").value
+      username: document.getElementById("usernameInput").value
     });
     console.log(body);
     const myHeaders = new Headers();
