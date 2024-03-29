@@ -1,11 +1,11 @@
 
-export default function Login() {
+export default function Login({setGlobal}) {
   const authenticate = async () => {
     const body = JSON.stringify({
       email: document.getElementById("emailInput").value,
       password: document.getElementById("passwordInput").value,
     });
-    console.log(body);
+    // console.log(body);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Access-Control-Allow-Origin", "*");
@@ -17,9 +17,24 @@ export default function Login() {
       redirect: "follow"
     };
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth`, requestOptions)
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth`, requestOptions)
       .catch((error) => console.error(error));
-    console.log(res);
+
+    if (!response.ok) {
+      // Handle error if the fetch request was not successful (e.g., status code outside 200-299 range)
+      throw new Error('Fetch request failed');
+    }
+
+    const res = await response.text(); // Extract the response body as text
+
+    try {
+      const userId = JSON.parse(res).userId;
+      if (userId) setGlobal({...JSON.parse(res)});
+      console.log(global);
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+    }
+
 
   }
 

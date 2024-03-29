@@ -1,9 +1,17 @@
-
-
 import Image from "next/image";
 
-export default function NavBar({children}) {
+export default function NavBar({children, name}) {
   //TODO: Add delete email functionality. Delete email call, then refresh email list.
+  const getInitials = (text) => {
+    // 1. Split the string into an array of words
+    const words = text.split(' ');
+
+    // 2. Map over the words to get the first letter and capitalize it
+    const initials = words.map(word => word[0].toUpperCase());
+
+    // 3. Join the initials back into a single string
+    return initials.join('');
+  }
   return (
     <nav className="w-full h-14 shadow-md flex justify-between">
       <span className="inline-flex h-16 w-16 items-center justify-center ml-8">
@@ -19,7 +27,7 @@ export default function NavBar({children}) {
       </div>
 
       <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-500 float-right mt-1 mr-8">
-        <span className="text-white">TW</span>
+        <span className="text-white">{getInitials(name)}</span>
       </span>
     </nav>
   );

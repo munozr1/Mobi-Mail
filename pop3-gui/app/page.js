@@ -13,10 +13,14 @@ export default function Home() {
   const [newEmail, ToggleNewEmailUi] = useState(false);
   const [side_email_view, update_side_email_view] = useState(null);
   const [tab, setTab] = useState("inbox");
+  const [inbox, setInbox] = useState([]);
+  const [isLoading, setLoading] = useState(true);
 
   const openNewEmailUi = () => {
     ToggleNewEmailUi(true);
   }
+
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape" && newEmail) {
@@ -24,17 +28,42 @@ export default function Home() {
       }
     };
 
+    const fetchEmails = async () => {
+      setLoading(true);
+      try{
+        const url = process.env.NEXT_PUBLIC_BACKEND_URL;
+        const api_url = `${url}/${tab}?userId=${global.userId}`;
+        console.log(api_url);
+        const response = await fetch(api_url);
+        let data = await response.json();
+        data = data.map(email => {
+          email.body = {__html: email.body}
+          return email;
+        })
+        console.log(data);
+        setInbox(data);
+      }
+      catch(error){
+        console.error(error);
+      }
+      finally{
+        setLoading(false);
+      }
+    }
+    if(global.userId)
+      fetchEmails();
+
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [newEmail]);
+  }, [newEmail, tab, global]);
 
 if(global.userId)
   return (
     <main className=" overflow-hidden">
-      <NavBar>
+      <NavBar name={global.username}>
         <Tooltip message="Inbox" action={() => setTab("inbox")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +132,7 @@ if(global.userId)
       </NavBar>
       <div className="flex">
         <div className="min-w-80">
-          <EmailList action={update_side_email_view} tab={tab}/>
+         { !isLoading && global.userId ? <EmailList emails={inbox} action={update_side_email_view} tab={tab}/>: null}
         </div>
         <div className="m-2">
           <EmailView email={side_email_view} />
@@ -121,7 +150,7 @@ if(global.userId)
 
   return (
   <main className=" overflow-hidden">
-    <Login />
+    <Login setGlobal={setGlobal} />
   </main>
   );
 }
