@@ -4,11 +4,13 @@ import EmailView from "@/components/email-view/page";
 import Login from "@/components/login/page";
 import NavBar from "@/components/navbar/page";
 import NewEmail from "@/components/new-email/page";
+import Register from "@/components/register/page";
 import Tooltip from "@/components/tooltip/page";
 import { useState, useEffect } from "react";
 
 export default function Home() {
   const [global, setGlobal] = useState({});
+  const [register, setRegister] = useState(false);
   const [newEmail, ToggleNewEmailUi] = useState(false);
   const [side_email_view, update_side_email_view] = useState(null);
   const [tab, setTab] = useState("inbox");
@@ -172,7 +174,7 @@ if(global.userId)
 
   return (
   <main className=" overflow-hidden">
-    <Login setGlobal={setGlobal} />
+    {register ? <Register action={setRegister} setGlobal={setGlobal}/>:<Login action={setRegister} setGlobal={setGlobal} />}
   </main>
   );
 }
