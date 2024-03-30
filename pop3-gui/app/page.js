@@ -25,7 +25,6 @@ export default function Home() {
     const string = document.getElementById("search").value;
     console.log(string);
     if(string){
-      setLoading(true);
       try{
         const url = process.env.NEXT_PUBLIC_BACKEND_URL;
         const api_url = `${url}/search?userId=${global.userId}&query=${string}`;
@@ -39,9 +38,6 @@ export default function Home() {
       }
       catch(error){
         console.error(error);
-      }
-      finally{
-        setLoading(false);
       }
     }
   }
@@ -156,7 +152,7 @@ if(global.userId)
       </NavBar>
       <div className="flex">
         <div className="min-w-80">
-         { !isLoading && global.userId ? <EmailList search={search} emails={inbox} action={update_side_email_view} tab={tab}/>: null}
+         { global.userId ? <EmailList search={search} emails={inbox} action={update_side_email_view} tab={tab}/>: null}
         </div>
         <div className="m-2">
           <EmailView email={side_email_view} />

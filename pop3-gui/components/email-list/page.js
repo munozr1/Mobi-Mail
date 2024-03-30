@@ -69,7 +69,7 @@ export default function EmailList({action, emails, search}) {
         onChange={handleInputChange}
       />
     </div>
-    <ul className="border">
+    { emails ? <ul className="border">
       {
         emails.map(email => (
           <li key={email.email_id} onClick={() => action(email)} className="flex items-center border-b-2 justify-between scale-100 hover:scale-105 ml-2 mr-2 hover:cursor-pointer">
@@ -82,6 +82,7 @@ export default function EmailList({action, emails, search}) {
         ))
       }
     </ul>
+    : <p className="text-center">No emails found</p> }
     </div>
   );
   }
