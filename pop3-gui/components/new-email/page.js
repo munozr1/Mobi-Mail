@@ -2,39 +2,33 @@ import Tooltip from "../tooltip/page";
 
 export default function NewEmail({id}) {
   const send = async () => {
-    const string = document.getElementById("search").value;
-    console.log(string);
-    if(string){
-      setLoading(true);
-      try{
-        const url = process.env.NEXT_PUBLIC_BACKEND_URL;
-        const api_url = `${url}/emails`;
-        const body = JSON.stringify({
-          senderId: id,
-          recipient: document.getElementById("to").value,
-          body: document.getElementById("textarea").value,
-          subject: document.getElementById("subject").value
+    const url = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const api_url = `${url}/emails`;
+    const body = JSON.stringify({
+      senderId: id,
+      recipient: document.getElementById("to").value,
+      body: document.getElementById("textarea").value,
+      subject: document.getElementById("subject").value
+    });
+      console.log(body);
+      try {
+        const response = await fetch(api_url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: body,
         });
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("Access-Control-Allow-Origin", "*");
-        const requestOptions = {
-          method: "POST",
-          headers: myHeaders,
-          body,
-          redirect: "follow"
+        if (!response.ok) {
+          throw new Error('Failed to send email');
         }
-        const response = await fetch(api_url, requestOptions);
-        let data = await response.json();
-        console.log(data);
+        const result = await response.json();
+        console.log(result);
+        alert('Email successfully sent!');
+      } catch (error) {
+        console.error('Error sending email:', error);
+        alert('Error sending email. Please try again.');
       }
-      catch(error){
-        console.error(error);
-      }
-      finally{
-        setLoading(false);
-      }
-    }
   }
   return (
     <div className="shadow-lg bg-white rounded-md p-2 flex flex-col ring-1 ring-black ring-opacity-5">

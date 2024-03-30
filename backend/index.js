@@ -72,7 +72,14 @@ app.get('/inbox', (req, res) => {
 
     const userId = req.query.userId;
     console.log("inbox => ",userId);
-    const query = `SELECT * FROM emails WHERE to_id = ${userId}`
+    const query = `
+      SELECT
+          emails.*,
+          users.email AS from_email
+      FROM emails
+      JOIN users ON emails.from_id = users.user_id
+      WHERE emails.to_id = ${userId}
+    `;
     console.log(query)
     db.all(query, (err, rows) => {
         if (err) {
